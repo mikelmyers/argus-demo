@@ -12,7 +12,7 @@ import cadquery as cq
 
 
 def build(thickness: float, hole: float, boss_od: float, boss_x: float,
-          gusset: bool, locating_pin: bool) -> cq.Assembly:
+          gusset: bool, locating_pin: bool, gusset_offset: float = 10.0) -> cq.Assembly:
     plate = (
         cq.Workplane("XY")
         .box(90, 60, thickness, centered=(True, True, False))
@@ -30,7 +30,7 @@ def build(thickness: float, hole: float, boss_od: float, boss_x: float,
     asm.add(boss, name="boss")
     if gusset:
         g = (
-            cq.Workplane("XZ", origin=(boss_x + 10, 2.5, thickness))
+            cq.Workplane("XZ", origin=(boss_x + gusset_offset, 2.5, thickness))
             .polyline([(0, 0), (18, 0), (0, 12)]).close().extrude(5)
         )
         asm.add(g, name="gusset")
@@ -48,11 +48,13 @@ def main() -> None:
     ap.add_argument("--boss-od", type=float, default=20.0)
     ap.add_argument("--boss-x", type=float, default=0.0)
     ap.add_argument("--gusset", action="store_true")
+    ap.add_argument("--gusset-offset", type=float, default=10.0,
+                    help="gusset root distance from boss center (mm)")
     ap.add_argument("--no-locating-pin", action="store_true")
     ap.add_argument("--out", default="cad/bracket.step")
     args = ap.parse_args()
     build(args.thickness, args.hole, args.boss_od, args.boss_x,
-          args.gusset, not args.no_locating_pin).export(args.out)
+          args.gusset, not args.no_locating_pin, args.gusset_offset).export(args.out)
     print(f"wrote {args.out}")
 
 
