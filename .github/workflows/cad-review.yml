@@ -1,0 +1,20 @@
+name: cad-review
+
+on: pull_request
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  argus:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: mikelmyers/argus-diff@main
+        with:
+          density: "2.70"
+          fail-on-interference: "false"   # demo PR includes a deliberate interference
+          max-mass-delta-pct: "50"
